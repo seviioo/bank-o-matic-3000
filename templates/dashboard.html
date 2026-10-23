@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}My Account{% endblock %}
+{% block content %}
+<div class="grid gap-6 md:grid-cols-2">
+
+  <section class="bg-gradient-to-br from-amber-400 to-amber-600 text-slate-900 rounded-xl p-6 shadow-xl">
+    <p class="text-sm uppercase tracking-widest">Available Balance</p>
+    <p class="text-4xl font-bold mt-2">{{ peso(current_user.balance) }}</p>
+    <p class="mt-6 text-sm">{{ current_user.full_name }}</p>
+    <p class="text-sm font-bold tracking-widest">{{ current_user.account_number }}</p>
+  </section>
+
+  <section class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+    <h2 class="text-lg font-bold text-amber-400 mb-4">New Transaction</h2>
+    <form method="POST" action="{{ url_for('transaction') }}" class="space-y-3">
+      <div>
+        <label class="block text-sm mb-1" for="type">Type</label>
+        <select id="type" name="type" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600">
+          <option value="deposit">Deposit</option>
+          <option value="withdraw">Withdraw</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm mb-1" for="amount">Amount (₱)</label>
+        <input id="amount" name="amount" type="number" step="0.01" min="0.01" required
+               class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600 focus:border-amber-400 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm mb-1" for="pin">Confirm with your PIN</label>
+        <input id="pin" name="pin" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" required
+               class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600 focus:border-amber-400 outline-none tracking-widest">
+      </div>
+      <button type="submit" class="w-full bg-amber-400 text-slate-900 font-bold py-2 rounded hover:bg-amber-300">
+        Submit
+      </button>
+    </form>
+  </section>
+</div>
+
+<section class="mt-6 bg-slate-800 border border-slate-700 rounded-xl p-6">
+  <h2 class="text-lg font-bold text-amber-400 mb-4">Recent Transactions</h2>
+  {% if transactions %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead class="text-slate-400 border-b border-slate-600">
+        <tr><th class="py-2 pr-4">Date (UTC)</th><th class="pr-4">Type</th><th class="pr-4">Amount</th><th>Balance After</th></tr>
+      </thead>
+      <tbody>
+        {% for t in transactions %}
+        <tr class="border-b border-slate-700">
+          <td class="py-2 pr-4 whitespace-nowrap">{{ t.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td class="pr-4 {% if t.type == 'deposit' %}text-emerald-400{% else %}text-red-400{% endif %}">
+            {{ t.type|capitalize }}
+          </td>
+          <td class="pr-4">{{ peso(t.amount) }}</td>
+          <td>{{ peso(t.balance_after) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-slate-400 text-sm">No transactions yet. Make your first deposit!</p>
+  {% endif %}
+</section>
+{% endblock %}

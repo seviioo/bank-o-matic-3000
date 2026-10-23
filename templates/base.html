@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ bank_name }} | {% block title %}Online Banking{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100">
+
+  <header class="bg-slate-800 border-b-4 border-amber-400">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <a href="{{ url_for('home') }}" class="text-xl sm:text-2xl font-bold text-amber-400 tracking-tight">
+        🤖 {{ bank_name }}
+      </a>
+      {% if current_user %}
+      <nav class="flex flex-wrap items-center gap-3 text-sm">
+        <span class="text-slate-300">{{ current_user.full_name }}</span>
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('admin_logs') }}" class="hover:text-amber-400 underline">Audit Log</a>
+        {% endif %}
+        <a href="{{ url_for('change_pin') }}" class="hover:text-amber-400 underline">Change PIN</a>
+        <a href="{{ url_for('logout') }}" class="bg-amber-400 text-slate-900 font-bold px-3 py-1 rounded hover:bg-amber-300">Logout</a>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="mb-4 px-4 py-3 rounded border text-sm
+          {% if category == 'success' %}bg-emerald-900/60 border-emerald-500 text-emerald-200
+          {% else %}bg-red-900/60 border-red-500 text-red-200{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center text-xs text-slate-500 py-6">
+    {{ bank_name }}: "Beep boop, your money is safe."
+  </footer>
+</body>
+</html>

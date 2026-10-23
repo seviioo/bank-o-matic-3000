@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<section class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+  <h2 class="text-lg font-bold text-amber-400 mb-4">Create New Customer</h2>
+  <form method="POST" action="{{ url_for('create_customer') }}" class="grid gap-3 sm:grid-cols-3 items-end">
+    <div class="sm:col-span-1">
+      <label class="block text-sm mb-1" for="full_name">Full Name</label>
+      <input id="full_name" name="full_name" type="text" maxlength="100" required
+             class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600 focus:border-amber-400 outline-none">
+    </div>
+    <div>
+      <label class="block text-sm mb-1" for="default_pin">Default PIN (4 digits)</label>
+      <input id="default_pin" name="default_pin" type="text" inputmode="numeric" maxlength="4" pattern="\d{4}" required
+             class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600 focus:border-amber-400 outline-none tracking-widest">
+    </div>
+    <button type="submit" class="bg-amber-400 text-slate-900 font-bold py-2 rounded hover:bg-amber-300">
+      Create Customer
+    </button>
+  </form>
+</section>
+
+<section class="mt-6 bg-slate-800 border border-slate-700 rounded-xl p-6">
+  <h2 class="text-lg font-bold text-amber-400 mb-4">Customers ({{ customers|length }})</h2>
+  {% if customers %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead class="text-slate-400 border-b border-slate-600">
+        <tr><th class="py-2 pr-4">Account No.</th><th class="pr-4">Name</th><th class="pr-4">Balance</th><th class="pr-4">Status</th><th>Created (UTC)</th></tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr class="border-b border-slate-700">
+          <td class="py-2 pr-4 font-bold">{{ c.account_number }}</td>
+          <td class="pr-4">{{ c.full_name }}</td>
+          <td class="pr-4">{{ peso(c.balance) }}</td>
+          <td class="pr-4">
+            {% if c.is_locked() %}<span class="text-red-400">Locked</span>
+            {% elif c.must_change_pin %}<span class="text-amber-300">Default PIN</span>
+            {% else %}<span class="text-emerald-400">Active</span>{% endif %}
+          </td>
+          <td class="whitespace-nowrap">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-slate-400 text-sm">No customers yet. Create one above.</p>
+  {% endif %}
+</section>
+{% endblock %}

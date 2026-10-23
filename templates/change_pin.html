@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Change PIN{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-8 bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+  <h1 class="text-2xl font-bold text-amber-400 mb-1">Change PIN</h1>
+  {% if current_user.must_change_pin %}
+    <p class="text-amber-300 text-sm mb-4">You are using a default PIN. Please set a new one to continue.</p>
+  {% else %}
+    <p class="text-slate-400 text-sm mb-4">Your PIN must be exactly 4 digits.</p>
+  {% endif %}
+
+  <form method="POST" class="space-y-4">
+    {% for field, label in [('current_pin','Current PIN'),('new_pin','New PIN'),('confirm_pin','Confirm New PIN')] %}
+    <div>
+      <label class="block text-sm mb-1" for="{{ field }}">{{ label }}</label>
+      <input id="{{ field }}" name="{{ field }}" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" required
+             class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-600 focus:border-amber-400 outline-none tracking-widest">
+    </div>
+    {% endfor %}
+    <button type="submit" class="w-full bg-amber-400 text-slate-900 font-bold py-2 rounded hover:bg-amber-300">
+      Save New PIN
+    </button>
+  </form>
+</div>
+{% endblock %}
