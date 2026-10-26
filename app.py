@@ -295,11 +295,18 @@ def transaction():
 
 def init_db():
     db.create_all()
-    if not User.query.filter_by(role="admin").first():
+    admin = User.query.filter_by(role="admin").first()
+    if not admin:
         admin = User(role="admin", account_number="ADMIN", full_name="Bank Administrator",
                      balance=0, must_change_pin=True)
         admin.set_pin(os.getenv("ADMIN_PIN", "1234"))
         db.session.add(admin)
+        db.session.commit()
+    elif os.getenv("RESET_ADMIN") == "1":
+        # Emergency reset: set RESET_ADMIN=1 on the server, then remove it afterward
+        admin.set_pin(os.getenv("ADMIN_PIN", "1234"))
+        admin.must_change_pin = True
+        admin.reset_attempts()
         db.session.commit()
 
 
